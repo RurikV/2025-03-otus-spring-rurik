@@ -26,6 +26,11 @@ public class AppProperties implements TestConfig, TestFileNameProvider, LocaleCo
 
     @Override
     public String getTestFileName() {
-        return fileNameByLocaleTag.get(locale.toLanguageTag());
+        String fileName = fileNameByLocaleTag.get(locale.toLanguageTag());
+        if (fileName == null) {
+            // If no file is found for the current locale, use the default file (questions.csv)
+            fileName = "questions.csv";
+        }
+        return fileName;
     }
 }
