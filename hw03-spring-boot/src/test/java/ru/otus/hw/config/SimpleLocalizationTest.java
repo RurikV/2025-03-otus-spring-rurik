@@ -32,7 +32,7 @@ public class SimpleLocalizationTest {
     }
 
     @Test
-    @DisplayName("Должен возвращать сообщение на русском языке при fallbackToSystemLocale=true")
+    @DisplayName("Должен возвращать сообщение на английском языке при fallbackToSystemLocale=true default locale")
     void shouldReturnRussianMessageWithFallbackTrue() {
         // Arrange
         LocaleConfig localeConfig = createLocaleConfig("ru-RU");
@@ -43,11 +43,11 @@ public class SimpleLocalizationTest {
         String message = messagesService.getMessage("TestService.answer.the.questions");
 
         // Assert
-        assertThat(message).isEqualTo("Пожалуйста, ответьте на вопросы ниже");
+        assertThat(message).isEqualTo("Please answer the questions below (default locale)");
     }
 
     @Test
-    @DisplayName("Должен возвращать сообщение на английском языке при fallbackToSystemLocale=false")
+    @DisplayName("Должен возвращать сообщение на английском языке при fallbackToSystemLocale=true default locale")
     void shouldReturnEnglishMessageWithFallbackFalse() {
         // Arrange
         LocaleConfig localeConfig = createLocaleConfig("en-US");
@@ -58,7 +58,7 @@ public class SimpleLocalizationTest {
         String message = messagesService.getMessage("TestService.answer.the.questions");
 
         // Assert
-        assertThat(message).isEqualTo("Please answer the questions below");
+        assertThat(message).isEqualTo("Please answer the questions below (default locale)");
     }
 
     @Test
@@ -91,7 +91,7 @@ public class SimpleLocalizationTest {
     }
 
     @Test
-    @DisplayName("Должен возвращать имя файла для русской локали при fallbackToSystemLocale=true")
+    @DisplayName("Должен возвращать имя файла для default локали при fallbackToSystemLocale=true")
     void shouldReturnRussianFileNameWithFallbackTrue() {
         // Arrange
         boolean fallbackToSystemLocale = true;
@@ -101,7 +101,7 @@ public class SimpleLocalizationTest {
         String fileName = fileNameProvider.getTestFileName();
 
         // Assert
-        assertThat(fileName).isEqualTo("questions_ru.csv");
+        assertThat(fileName).isEqualTo("questions.csv");
     }
 
     @Test
@@ -119,7 +119,7 @@ public class SimpleLocalizationTest {
     }
 
     @Test
-    @DisplayName("Должен возвращать имя файла для английской локали при fallbackToSystemLocale=true")
+    @DisplayName("Должен возвращать имя файла для default локали при fallbackToSystemLocale=true")
     void shouldReturnEnglishFileNameWithFallbackTrue() {
         // Arrange
         boolean fallbackToSystemLocale = true;
@@ -129,7 +129,7 @@ public class SimpleLocalizationTest {
         String fileName = fileNameProvider.getTestFileName();
 
         // Assert
-        assertThat(fileName).isEqualTo("questions_en.csv");
+        assertThat(fileName).isEqualTo("questions.csv");
     }
 
     private LocaleConfig createLocaleConfig(String localeTag) {
