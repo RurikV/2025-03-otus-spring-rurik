@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 public class NoFallbackTestFileNameProvider implements TestFileNameProvider {
 
     private final LocaleConfig localeConfig;
+
     private final AppProperties appProperties;
 
     @Override

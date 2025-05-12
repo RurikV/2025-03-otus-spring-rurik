@@ -10,6 +10,7 @@ import java.util.Locale;
 public class FallbackTestFileNameProvider implements TestFileNameProvider {
 
     private final LocaleConfig localeConfig;
+
     private final AppProperties appProperties;
 
     @Override
