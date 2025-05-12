@@ -1,5 +1,6 @@
 package ru.otus.hw.config;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.MessageSource;
@@ -17,6 +18,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Тесты локализации")
 public class SimpleLocalizationTest {
+
+    @BeforeEach
+    void printSystemDefaultLocale() {
+        System.out.println("[DEBUG_LOG] System default locale: " + Locale.getDefault());
+    }
 
     @Test
     @DisplayName("Должен возвращать сообщение на русском языке при fallbackToSystemLocale=false")
