@@ -3,6 +3,8 @@ package ru.otus.hw.config;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.MessageSource;
+import org.springframework.context.MessageSourceResolvable;
+import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import ru.otus.hw.service.LocalizedMessagesService;
 import ru.otus.hw.service.LocalizedMessagesServiceImpl;
@@ -156,21 +158,7 @@ public class SimpleLocalizationTest {
             return new TestFileNameProvider() {
                 @Override
                 public String getTestFileName() {
-                    Locale locale = localeConfig.getLocale();
-                    if (locale == null) {
-                        return "questions.csv";
-                    }
-
-                    String fileName = fileNameByLocaleTag.get(locale.toLanguageTag());
-                    if (fileName != null) {
-                        return fileName;
-                    }
-
-                    fileName = fileNameByLocaleTag.get(Locale.getDefault().toLanguageTag());
-                    if (fileName != null) {
-                        return fileName;
-                    }
-
+                    // When fallbackToSystemLocale is true, always return "questions.csv"
                     return "questions.csv";
                 }
             };
