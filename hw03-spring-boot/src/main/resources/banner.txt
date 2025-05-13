@@ -1,0 +1,8 @@
+${AnsiColor.BRIGHT_BLUE}  ____  _             _            _     ____              _   
+${AnsiColor.BRIGHT_BLUE} / ___|| |_ _   _  __| | ___ _ __ | |_  | __ )  ___   ___ | |_ 
+${AnsiColor.BRIGHT_BLUE} \___ \| __| | | |/ _` |/ _ \ '_ \| __| |  _ \ / _ \ / _ \| __|
+${AnsiColor.BRIGHT_BLUE}  ___) | |_| |_| | (_| |  __/ | | | |_  | |_) | (_) | (_) | |_ 
+${AnsiColor.BRIGHT_BLUE} |____/ \__|\__,_|\__,_|\___|_| |_|\__| |____/ \___/ \___/ \__|
+${AnsiColor.BRIGHT_GREEN}
+:: Spring Boot ::                (v3.4.1)
+${AnsiColor.DEFAULT}
