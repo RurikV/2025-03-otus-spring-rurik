@@ -30,7 +30,7 @@ public class SimpleLocalizationTest {
         // Arrange
         LocaleConfig localeConfig = createLocaleConfig("ru-RU");
         MessageSource messageSource = createMessageSource(false);
-        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(localeConfig, messageSource, false);
+        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(localeConfig, messageSource, false, "ru-RU");
 
         // Act
         String message = messagesService.getMessage("TestService.answer.the.questions");
@@ -91,7 +91,7 @@ public class SimpleLocalizationTest {
         // Arrange
         LocaleConfig localeConfig = createLocaleConfig("en-US");
         MessageSource messageSource = createMessageSource(true);
-        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(localeConfig, messageSource, true);
+        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(localeConfig, messageSource, true, "en-US");
 
         // Act
         String message = messagesService.getMessage("TestService.answer.the.questions");
@@ -106,7 +106,7 @@ public class SimpleLocalizationTest {
         // Arrange
         LocaleConfig localeConfig = createLocaleConfig("fr-FR");
         MessageSource messageSource = createMessageSource(false);
-        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(localeConfig, messageSource, false);
+        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(localeConfig, messageSource, false, "fr-FR");
 
         // Act
         String message = messagesService.getMessage("TestService.answer.the.questions");
@@ -122,7 +122,7 @@ public class SimpleLocalizationTest {
         // Arrange
         LocaleConfig localeConfig = createLocaleConfig("fr-FR");
         MessageSource messageSource = createMessageSource(true);
-        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(localeConfig, messageSource, true);
+        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(localeConfig, messageSource, true, "fr-FR");
 
         // Act
         String message = messagesService.getMessage("TestService.answer.the.questions");
