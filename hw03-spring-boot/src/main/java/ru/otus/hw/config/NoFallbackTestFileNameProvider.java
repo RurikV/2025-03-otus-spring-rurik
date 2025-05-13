@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
+import java.util.Locale;
+
 @RequiredArgsConstructor
 @Component
 @Primary
@@ -15,6 +17,12 @@ public class NoFallbackTestFileNameProvider implements TestFileNameProvider {
 
     @Override
     public String getTestFileName() {
+        // If fallbackToSystemLocale is true, always return "questions.csv"
+        if (appProperties.isFallbackToSystemLocale()) {
+            return "questions.csv";
+        }
+
+        // If fallbackToSystemLocale is false, try to find a file for the provided locale
         var locale = localeConfig.getLocale();
         if (locale == null) {
             return "questions.csv";
@@ -25,6 +33,7 @@ public class NoFallbackTestFileNameProvider implements TestFileNameProvider {
             return fileName;
         }
 
+        // If no file is found for the provided locale, return "questions.csv"
         return "questions.csv";
     }
 }

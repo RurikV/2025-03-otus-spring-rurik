@@ -16,8 +16,8 @@ public class Application {
 
         ApplicationContext context = SpringApplication.run(Application.class, args);
 
-        // Print system's default locale name
-        System.out.println("System's default locale: " + Locale.getDefault().getDisplayName());
+        // Print system's default locale short name
+        System.out.println("System's default locale: " + Locale.getDefault().toLanguageTag());
 
         var testRunnerService = context.getBean(TestRunnerService.class);
         testRunnerService.run();

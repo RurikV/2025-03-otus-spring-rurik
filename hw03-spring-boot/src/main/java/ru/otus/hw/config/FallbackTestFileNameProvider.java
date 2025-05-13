@@ -15,6 +15,12 @@ public class FallbackTestFileNameProvider implements TestFileNameProvider {
 
     @Override
     public String getTestFileName() {
+        // If fallbackToSystemLocale is true, always return "questions.csv"
+        if (appProperties.isFallbackToSystemLocale()) {
+            return "questions.csv";
+        }
+
+        // If fallbackToSystemLocale is false, try to find a file for the provided locale
         var locale = localeConfig.getLocale();
         if (locale == null) {
             return "questions.csv";
@@ -25,11 +31,7 @@ public class FallbackTestFileNameProvider implements TestFileNameProvider {
             return fileName;
         }
 
-        fileName = appProperties.getFileNameByLocaleTag().get(Locale.getDefault().toLanguageTag());
-        if (fileName != null) {
-            return fileName;
-        }
-
+        // If no file is found for the provided locale, return "questions.csv"
         return "questions.csv";
     }
 }

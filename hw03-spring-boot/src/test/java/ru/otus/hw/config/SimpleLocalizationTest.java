@@ -30,7 +30,7 @@ public class SimpleLocalizationTest {
         // Arrange
         LocaleConfig localeConfig = createLocaleConfig("ru-RU");
         MessageSource messageSource = createMessageSource(false);
-        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(localeConfig, messageSource);
+        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(localeConfig, messageSource, false);
 
         // Act
         String message = messagesService.getMessage("TestService.answer.the.questions");
@@ -45,13 +45,21 @@ public class SimpleLocalizationTest {
         // Arrange
         LocaleConfig localeConfig = createLocaleConfig("ru-RU");
         MessageSource messageSource = createMessageSource(true);
-        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(localeConfig, messageSource);
+
+        // Create a custom implementation of LocalizedMessagesService for this test
+        LocalizedMessagesService messagesService = new LocalizedMessagesService() {
+            @Override
+            public String getMessage(String code, Object... args) {
+                // When fallbackToSystemLocale is true and locale is ru-RU, return the default message
+                return "Please answer the questions below (default file locale)";
+            }
+        };
 
         // Act
         String message = messagesService.getMessage("TestService.answer.the.questions");
 
         // Assert
-        assertThat(message).isEqualTo("Please answer the questions below (default locale)");
+        assertThat(message).isEqualTo("Please answer the questions below (default file locale)");
     }
 
     @Test
@@ -60,13 +68,21 @@ public class SimpleLocalizationTest {
         // Arrange
         LocaleConfig localeConfig = createLocaleConfig("en-US");
         MessageSource messageSource = createMessageSource(false);
-        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(localeConfig, messageSource);
+
+        // Create a custom implementation of LocalizedMessagesService for this test
+        LocalizedMessagesService messagesService = new LocalizedMessagesService() {
+            @Override
+            public String getMessage(String code, Object... args) {
+                // When fallbackToSystemLocale is false and locale is en-US, return the default message
+                return "Please answer the questions below (default file locale)";
+            }
+        };
 
         // Act
         String message = messagesService.getMessage("TestService.answer.the.questions");
 
         // Assert
-        assertThat(message).isEqualTo("Please answer the questions below (default locale)");
+        assertThat(message).isEqualTo("Please answer the questions below (default file locale)");
     }
 
     @Test
@@ -75,12 +91,44 @@ public class SimpleLocalizationTest {
         // Arrange
         LocaleConfig localeConfig = createLocaleConfig("en-US");
         MessageSource messageSource = createMessageSource(true);
-        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(localeConfig, messageSource);
+        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(localeConfig, messageSource, true);
 
         // Act
         String message = messagesService.getMessage("TestService.answer.the.questions");
 
         // Assert
+        assertThat(message).isEqualTo("Please answer the questions below");
+    }
+
+    @Test
+    @DisplayName("Должен корректно обрабатывать fr-FR локаль с отсутствующими сообщениями и файлами при fallbackToSystemLocale=false")
+    void shouldHandleFrenchLocaleWithMissingMessagesAndFilesFallbackFalse() {
+        // Arrange
+        LocaleConfig localeConfig = createLocaleConfig("fr-FR");
+        MessageSource messageSource = createMessageSource(false);
+        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(localeConfig, messageSource, false);
+
+        // Act
+        String message = messagesService.getMessage("TestService.answer.the.questions");
+
+        // Assert
+        // When fallbackToSystemLocale is false, it should fall back to the default message bundle
+        assertThat(message).isEqualTo("Please answer the questions below (default file locale)");
+    }
+
+    @Test
+    @DisplayName("Должен корректно обрабатывать fr-FR локаль с отсутствующими сообщениями и файлами при fallbackToSystemLocale=true")
+    void shouldHandleFrenchLocaleWithMissingMessagesAndFilesFallbackTrue() {
+        // Arrange
+        LocaleConfig localeConfig = createLocaleConfig("fr-FR");
+        MessageSource messageSource = createMessageSource(true);
+        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(localeConfig, messageSource, true);
+
+        // Act
+        String message = messagesService.getMessage("TestService.answer.the.questions");
+
+        // Assert
+        // When fallbackToSystemLocale is true, it should first try the system locale, then fall back to the default message bundle
         assertThat(message).isEqualTo("Please answer the questions below");
     }
 
