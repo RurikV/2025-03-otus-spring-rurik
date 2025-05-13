@@ -200,6 +200,7 @@ public class SimpleLocalizationTest {
         Map<String, String> fileNameByLocaleTag = new HashMap<>();
         fileNameByLocaleTag.put("ru-RU", "questions_ru.csv");
         fileNameByLocaleTag.put("en-US", "questions_en.csv");
+        fileNameByLocaleTag.put("en", "questions_en.csv");
         appProperties.setFileNameByLocaleTag(fileNameByLocaleTag);
         return appProperties;
     }
