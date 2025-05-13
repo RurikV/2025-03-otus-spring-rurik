@@ -4,8 +4,8 @@ spring:
     encoding: UTF-8
     fallbackToSystemLocale: false
 test:
-  rightAnswersCountToPass: 3
-  locale: en-US
+  rightAnswersCountToPass: 6
+  locale: fr-FR
   fileNameByLocaleTag:
     ru-RU: questions_ru.csv
-    en-US: questions.csv
+    en-US: questions_en.csv

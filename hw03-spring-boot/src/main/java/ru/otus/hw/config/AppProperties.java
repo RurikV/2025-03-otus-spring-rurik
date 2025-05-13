@@ -2,30 +2,26 @@ package ru.otus.hw.config;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.Locale;
 import java.util.Map;
 
 @Setter
+@Getter
 @ConfigurationProperties(prefix = "test")
 public class AppProperties implements TestConfig, TestFileNameProvider, LocaleConfig {
 
-    @Getter
     private int rightAnswersCountToPass;
 
-    @Getter
     private Locale locale;
 
-    @Getter
     private Map<String, String> fileNameByLocaleTag;
 
-    @Getter
-    private final boolean fallbackToSystemLocale;
+    private boolean fallbackToSystemLocale;
 
-    public AppProperties(@Value("${spring.messages.fallbackToSystemLocale:false}") boolean fallbackToSystemLocale) {
-        this.fallbackToSystemLocale = fallbackToSystemLocale;
+    public AppProperties() {
+        // Default constructor for Spring to use when binding properties
     }
 
     public void setLocale(String locale) {

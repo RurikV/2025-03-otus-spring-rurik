@@ -28,9 +28,9 @@ public class SimpleLocalizationTest {
     @DisplayName("Должен возвращать сообщение на русском языке при fallbackToSystemLocale=false")
     void shouldReturnRussianMessageWithFallbackFalse() {
         // Arrange
-        LocaleConfig localeConfig = createLocaleConfig("ru-RU");
+        AppProperties appProperties = createAppProperties("ru-RU", false);
         MessageSource messageSource = createMessageSource(false);
-        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(localeConfig, messageSource, false, "ru-RU");
+        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(appProperties, messageSource);
 
         // Act
         String message = messagesService.getMessage("TestService.answer.the.questions");
@@ -89,9 +89,9 @@ public class SimpleLocalizationTest {
     @DisplayName("Должен возвращать сообщение на английском языке при fallbackToSystemLocale=true")
     void shouldReturnEnglishMessageWithFallbackTrue() {
         // Arrange
-        LocaleConfig localeConfig = createLocaleConfig("en-US");
+        AppProperties appProperties = createAppProperties("en-US", true);
         MessageSource messageSource = createMessageSource(true);
-        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(localeConfig, messageSource, true, "en-US");
+        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(appProperties, messageSource);
 
         // Act
         String message = messagesService.getMessage("TestService.answer.the.questions");
@@ -104,9 +104,9 @@ public class SimpleLocalizationTest {
     @DisplayName("Должен корректно обрабатывать fr-FR локаль с отсутствующими сообщениями и файлами при fallbackToSystemLocale=false")
     void shouldHandleFrenchLocaleWithMissingMessagesAndFilesFallbackFalse() {
         // Arrange
-        LocaleConfig localeConfig = createLocaleConfig("fr-FR");
+        AppProperties appProperties = createAppProperties("fr-FR", false);
         MessageSource messageSource = createMessageSource(false);
-        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(localeConfig, messageSource, false, "fr-FR");
+        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(appProperties, messageSource);
 
         // Act
         String message = messagesService.getMessage("TestService.answer.the.questions");
@@ -120,9 +120,9 @@ public class SimpleLocalizationTest {
     @DisplayName("Должен корректно обрабатывать fr-FR локаль с отсутствующими сообщениями и файлами при fallbackToSystemLocale=true")
     void shouldHandleFrenchLocaleWithMissingMessagesAndFilesFallbackTrue() {
         // Arrange
-        LocaleConfig localeConfig = createLocaleConfig("fr-FR");
+        AppProperties appProperties = createAppProperties("fr-FR", true);
         MessageSource messageSource = createMessageSource(true);
-        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(localeConfig, messageSource, true, "fr-FR");
+        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(appProperties, messageSource);
 
         // Act
         String message = messagesService.getMessage("TestService.answer.the.questions");
@@ -147,7 +147,7 @@ public class SimpleLocalizationTest {
     }
 
     @Test
-    @DisplayName("Должен возвращать имя файла для default локали при fallbackToSystemLocale=true")
+    @DisplayName("Должен возвращать имя файла для русской локали при fallbackToSystemLocale=true")
     void shouldReturnRussianFileNameWithFallbackTrue() {
         // Arrange
         boolean fallbackToSystemLocale = true;
@@ -157,7 +157,7 @@ public class SimpleLocalizationTest {
         String fileName = fileNameProvider.getTestFileName();
 
         // Assert
-        assertThat(fileName).isEqualTo("questions.csv");
+        assertThat(fileName).isEqualTo("questions_ru.csv");
     }
 
     @Test
@@ -175,7 +175,7 @@ public class SimpleLocalizationTest {
     }
 
     @Test
-    @DisplayName("Должен возвращать имя файла для default локали при fallbackToSystemLocale=true")
+    @DisplayName("Должен возвращать имя файла для английской локали при fallbackToSystemLocale=true")
     void shouldReturnEnglishFileNameWithFallbackTrue() {
         // Arrange
         boolean fallbackToSystemLocale = true;
@@ -185,12 +185,23 @@ public class SimpleLocalizationTest {
         String fileName = fileNameProvider.getTestFileName();
 
         // Assert
-        assertThat(fileName).isEqualTo("questions.csv");
+        assertThat(fileName).isEqualTo("questions_en.csv");
     }
 
     private LocaleConfig createLocaleConfig(String localeTag) {
         Locale locale = Locale.forLanguageTag(localeTag);
         return () -> locale;
+    }
+
+    private AppProperties createAppProperties(String localeTag, boolean fallbackToSystemLocale) {
+        AppProperties appProperties = new AppProperties();
+        appProperties.setLocale(localeTag);
+        appProperties.setFallbackToSystemLocale(fallbackToSystemLocale);
+        Map<String, String> fileNameByLocaleTag = new HashMap<>();
+        fileNameByLocaleTag.put("ru-RU", "questions_ru.csv");
+        fileNameByLocaleTag.put("en-US", "questions_en.csv");
+        appProperties.setFileNameByLocaleTag(fileNameByLocaleTag);
+        return appProperties;
     }
 
     private MessageSource createMessageSource(boolean fallbackToSystemLocale) {
@@ -208,31 +219,8 @@ public class SimpleLocalizationTest {
 
         LocaleConfig localeConfig = createLocaleConfig(localeTag);
 
-        if (fallbackToSystemLocale) {
-            return new TestFileNameProvider() {
-                @Override
-                public String getTestFileName() {
-                    // When fallbackToSystemLocale is true, always return "questions.csv"
-                    return "questions.csv";
-                }
-            };
-        } else {
-            return new TestFileNameProvider() {
-                @Override
-                public String getTestFileName() {
-                    Locale locale = localeConfig.getLocale();
-                    if (locale == null) {
-                        return "questions.csv";
-                    }
-
-                    String fileName = fileNameByLocaleTag.get(locale.toLanguageTag());
-                    if (fileName != null) {
-                        return fileName;
-                    }
-
-                    return "questions.csv";
-                }
-            };
-        }
+        // Use AppProperties directly to match its behavior
+        AppProperties appProperties = createAppProperties(localeTag, fallbackToSystemLocale);
+        return appProperties;
     }
 }

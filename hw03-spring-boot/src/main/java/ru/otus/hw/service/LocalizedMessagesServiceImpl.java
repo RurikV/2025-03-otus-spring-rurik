@@ -1,48 +1,33 @@
 package ru.otus.hw.service;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
-import ru.otus.hw.config.LocaleConfig;
+import ru.otus.hw.config.AppProperties;
 
 import java.util.Locale;
 
 @Service
 public class LocalizedMessagesServiceImpl implements LocalizedMessagesService {
 
-    private final LocaleConfig localeConfig;
+    private final AppProperties appProperties;
 
     private final MessageSource messageSource;
 
-    private final boolean fallbackToSystemLocale;
-
-    private final Locale configLocale;
-
-    public LocalizedMessagesServiceImpl(LocaleConfig localeConfig, MessageSource messageSource,
-                                       @Value("${spring.messages.fallbackToSystemLocale:false}")
-                                        boolean fallbackToSystemLocale,
-                                       @Value("${test.locale}") String localeTag) {
-        this.localeConfig = localeConfig;
+    public LocalizedMessagesServiceImpl(AppProperties appProperties, MessageSource messageSource) {
+        this.appProperties = appProperties;
         this.messageSource = messageSource;
-        this.fallbackToSystemLocale = fallbackToSystemLocale;
-        this.configLocale = Locale.forLanguageTag(localeTag);
     }
 
     @Override
     public String getMessage(String code, Object... args) {
-        // Use the locale from application.yml directly
-        if (configLocale != null) {
-            return messageSource.getMessage(code, args, configLocale);
-        }
-
-        // Fallback to the locale from LocaleConfig if configLocale is null
-        Locale locale = localeConfig.getLocale();
+        // Get the locale from AppProperties
+        Locale locale = appProperties.getLocale();
 
         if (locale != null) {
             return messageSource.getMessage(code, args, locale);
         }
 
-        if (fallbackToSystemLocale) {
+        if (appProperties.isFallbackToSystemLocale()) {
             return messageSource.getMessage(code, args, Locale.getDefault());
         } else {
             return messageSource.getMessage(code, args, Locale.ROOT);
