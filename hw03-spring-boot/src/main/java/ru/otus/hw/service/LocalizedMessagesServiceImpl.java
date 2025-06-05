@@ -20,17 +20,8 @@ public class LocalizedMessagesServiceImpl implements LocalizedMessagesService {
 
     @Override
     public String getMessage(String code, Object... args) {
-        // Get the locale from AppProperties
+        // Get the locale from AppProperties (now never returns null)
         Locale locale = appProperties.getLocale();
-
-        if (locale != null) {
-            return messageSource.getMessage(code, args, locale);
-        }
-
-        if (appProperties.isFallbackToSystemLocale()) {
-            return messageSource.getMessage(code, args, Locale.getDefault());
-        } else {
-            return messageSource.getMessage(code, args, Locale.ROOT);
-        }
+        return messageSource.getMessage(code, args, locale);
     }
 }

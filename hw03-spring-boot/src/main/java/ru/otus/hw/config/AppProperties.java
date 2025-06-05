@@ -29,14 +29,24 @@ public class AppProperties implements TestConfig, TestFileNameProvider, LocaleCo
     }
 
     @Override
-    public String getTestFileName() {
-        // Check if locale is null to avoid NullPointerException
-        if (locale == null) {
-            // If locale is null, use the default file
-            return "questions.csv";
+    public Locale getLocale() {
+        if (locale != null) {
+            return locale;
         }
 
-        String fileName = fileNameByLocaleTag.get(locale.toLanguageTag());
+        if (fallbackToSystemLocale) {
+            return Locale.getDefault();
+        } else {
+            return Locale.ROOT;
+        }
+    }
+
+    @Override
+    public String getTestFileName() {
+        // Get the locale (which will never be null now)
+        Locale currentLocale = getLocale();
+
+        String fileName = fileNameByLocaleTag.get(currentLocale.toLanguageTag());
         if (fileName == null) {
             // If no file is found for the current locale, use the default file (questions.csv)
             fileName = "questions.csv";
