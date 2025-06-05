@@ -43,7 +43,7 @@ class TestServiceImplTest {
         LocalizedIOService ioService = mock(LocalizedIOService.class);
         // Simulate user selecting the first answer for both questions
         // First question: correct answer, Second question: wrong answer
-        when(ioService.readIntForRangeWithPrompt(eq(1), eq(2), anyString(), anyString()))
+        when(ioService.readIntForRangeWithPromptLocalized(eq(1), eq(2), anyString(), anyString()))
                 .thenReturn(1);
 
         TestService testService = new TestServiceImpl(ioService, questionDao);

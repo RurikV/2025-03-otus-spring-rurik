@@ -43,10 +43,10 @@ public class TestServiceImpl implements TestService {
             ioService.printFormattedLine("%d. %s", i + 1, answers.get(i).text());
         }
 
-        int userAnswerIndex = ioService.readIntForRangeWithPrompt(
+        int userAnswerIndex = ioService.readIntForRangeWithPromptLocalized(
                 1, answers.size(),
-                "Please enter the number of your answer:",
-                "Invalid answer number. Please try again."
+                "TestService.enter.answer.number",
+                "TestService.invalid.answer.number"
         );
 
         return answers.get(userAnswerIndex - 1).isCorrect();
