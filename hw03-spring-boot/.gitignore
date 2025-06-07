@@ -1,6 +1,5 @@
 target/
 dependency-reduced-pom.xml
-/hw02-annotation-config/
 
 ### STS ###
 .apt_generated
@@ -11,7 +10,6 @@ dependency-reduced-pom.xml
 .springBeans
 .sts4-cache
 
-.mvm
 ### IntelliJ IDEA ###
 .idea
 *.iws
@@ -26,3 +24,4 @@ dependency-reduced-pom.xml
 /nbdist/
 /.nb-gradle/
 
+/show_content.py
