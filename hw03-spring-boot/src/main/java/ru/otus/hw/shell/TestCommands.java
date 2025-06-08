@@ -14,8 +14,11 @@ import ru.otus.hw.service.LocalizedIOService;
 public class TestCommands {
 
     private final TestService testService;
+
     private final StudentService studentService;
+
     private final ResultService resultService;
+
     private final LocalizedIOService ioService;
 
     @ShellMethod(value = "Start testing", key = {"start", "s"})
