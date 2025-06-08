@@ -11,13 +11,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import ru.otus.hw.config.AppProperties;
 import ru.otus.hw.config.TestIOConfig;
+import ru.otus.hw.config.TestShellConfig;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(classes = {Application.class, TestIOConfig.class})
+@SpringBootTest(classes = {Application.class, TestIOConfig.class, TestShellConfig.class})
 class CommonHwTest {
 
     private static final String CONFIGURATION_ANNOTATION_NAME = "org.springframework.context.annotation.Configuration";
