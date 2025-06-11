@@ -3,8 +3,6 @@ package ru.otus.hw.dao;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.otus.hw.Application;
-import ru.otus.hw.config.TestIOConfig;
 import ru.otus.hw.config.TestFileNameProvider;
 import ru.otus.hw.domain.Answer;
 import ru.otus.hw.domain.Question;
@@ -17,7 +15,13 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = {Application.class, TestIOConfig.class})
+@SpringBootTest(
+        properties = {
+                "spring.shell.interactive.enabled=false",
+                "spring.shell.script.enabled=false"
+        },
+        webEnvironment = SpringBootTest.WebEnvironment.NONE
+)
 @DisplayName("Dao для работы с вопросами")
 class CsvQuestionDaoTest {
 

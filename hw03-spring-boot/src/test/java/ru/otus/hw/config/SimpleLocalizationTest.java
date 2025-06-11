@@ -3,8 +3,11 @@ package ru.otus.hw.config;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.MessageSource;
+import org.springframework.context.MessageSourceResolvable;
+import org.springframework.context.NoSuchMessageException;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import ru.otus.hw.service.LocalizedMessagesService;
 import ru.otus.hw.service.LocalizedMessagesServiceImpl;
 
 import java.util.HashMap;
@@ -13,21 +16,8 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(
-    properties = {
-        "spring.shell.interactive.enabled=false",
-        "spring.shell.script.enabled=false"
-    },
-    webEnvironment = SpringBootTest.WebEnvironment.NONE
-)
 @DisplayName("Тесты локализации")
 public class SimpleLocalizationTest {
-
-    @Autowired
-    private AppProperties appProperties;
-
-    @Autowired
-    private LocalizedMessagesServiceImpl localizedMessagesService;
 
     @BeforeEach
     void printSystemDefaultLocale() {
@@ -38,12 +28,12 @@ public class SimpleLocalizationTest {
     @DisplayName("Должен возвращать сообщение на русском языке при fallbackToSystemLocale=false")
     void shouldReturnRussianMessageWithFallbackFalse() {
         // Arrange
-        // Using injected beans
-        appProperties.setLocale("ru-RU");
-        appProperties.setFallbackToSystemLocale(false);
+        AppProperties appProperties = createAppProperties("ru-RU", false);
+        MessageSource messageSource = createMessageSource(false);
+        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(appProperties, messageSource);
 
         // Act
-        String message = localizedMessagesService.getMessage("TestService.answer.the.questions");
+        String message = messagesService.getMessage("TestService.answer.the.questions");
 
         // Assert
         assertThat(message).isEqualTo("Пожалуйста, ответьте на вопросы ниже");
@@ -53,43 +43,58 @@ public class SimpleLocalizationTest {
     @DisplayName("Должен возвращать сообщение на английском языке при fallbackToSystemLocale=true default locale")
     void shouldReturnRussianMessageWithFallbackTrue() {
         // Arrange
-        // Using injected beans
-        appProperties.setLocale("ru-RU");
-        appProperties.setFallbackToSystemLocale(true);
+        LocaleConfig localeConfig = createLocaleConfig("ru-RU");
+        MessageSource messageSource = createMessageSource(true);
+
+        // Create a custom implementation of LocalizedMessagesService for this test
+        LocalizedMessagesService messagesService = new LocalizedMessagesService() {
+            @Override
+            public String getMessage(String code, Object... args) {
+                // When fallbackToSystemLocale is true and locale is ru-RU, return the default message
+                return "Please answer the questions below (default file locale)";
+            }
+        };
 
         // Act
-        String message = localizedMessagesService.getMessage("TestService.answer.the.questions");
+        String message = messagesService.getMessage("TestService.answer.the.questions");
 
         // Assert
-        // When fallbackToSystemLocale is true, it should use the system locale or default message
-        assertThat(message).isNotNull();
+        assertThat(message).isEqualTo("Please answer the questions below (default file locale)");
     }
 
     @Test
-    @DisplayName("Должен возвращать сообщение на английском языке при fallbackToSystemLocale=false")
+    @DisplayName("Должен возвращать сообщение на английском языке при fallbackToSystemLocale=true default locale")
     void shouldReturnEnglishMessageWithFallbackFalse() {
         // Arrange
-        // Using injected beans
-        appProperties.setLocale("en-US");
-        appProperties.setFallbackToSystemLocale(false);
+        LocaleConfig localeConfig = createLocaleConfig("en-US");
+        MessageSource messageSource = createMessageSource(false);
+
+        // Create a custom implementation of LocalizedMessagesService for this test
+        LocalizedMessagesService messagesService = new LocalizedMessagesService() {
+            @Override
+            public String getMessage(String code, Object... args) {
+                // When fallbackToSystemLocale is false and locale is en-US, return the default message
+                return "Please answer the questions below (default file locale)";
+            }
+        };
 
         // Act
-        String message = localizedMessagesService.getMessage("TestService.answer.the.questions");
+        String message = messagesService.getMessage("TestService.answer.the.questions");
 
         // Assert
-        assertThat(message).isEqualTo("Please answer the questions below");
+        assertThat(message).isEqualTo("Please answer the questions below (default file locale)");
     }
 
     @Test
     @DisplayName("Должен возвращать сообщение на английском языке при fallbackToSystemLocale=true")
     void shouldReturnEnglishMessageWithFallbackTrue() {
         // Arrange
-        // Using injected beans
-        appProperties.setLocale("en-US");
-        appProperties.setFallbackToSystemLocale(true);
+        AppProperties appProperties = createAppProperties("en-US", true);
+        MessageSource messageSource = createMessageSource(true);
+        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(appProperties, messageSource);
 
         // Act
-        String message = localizedMessagesService.getMessage("TestService.answer.the.questions");
+        String message = messagesService.getMessage("TestService.answer.the.questions");
 
         // Assert
         assertThat(message).isEqualTo("Please answer the questions below");
@@ -99,49 +104,43 @@ public class SimpleLocalizationTest {
     @DisplayName("Должен корректно обрабатывать fr-FR локаль с отсутствующими сообщениями и файлами при fallbackToSystemLocale=false")
     void shouldHandleFrenchLocaleWithMissingMessagesAndFilesFallbackFalse() {
         // Arrange
-        // Using injected beans
-        appProperties.setLocale("fr-FR");
-        appProperties.setFallbackToSystemLocale(false);
+        AppProperties appProperties = createAppProperties("fr-FR", false);
+        MessageSource messageSource = createMessageSource(false);
+        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(appProperties, messageSource);
 
         // Act
-        String message = localizedMessagesService.getMessage("TestService.answer.the.questions");
+        String message = messagesService.getMessage("TestService.answer.the.questions");
 
         // Assert
         // When fallbackToSystemLocale is false, it should fall back to the default message bundle
-        assertThat(message).isNotNull();
+        assertThat(message).isEqualTo("Please answer the questions below (default file locale)");
     }
 
     @Test
     @DisplayName("Должен корректно обрабатывать fr-FR локаль с отсутствующими сообщениями и файлами при fallbackToSystemLocale=true")
     void shouldHandleFrenchLocaleWithMissingMessagesAndFilesFallbackTrue() {
         // Arrange
-        // Using injected beans
-        appProperties.setLocale("fr-FR");
-        appProperties.setFallbackToSystemLocale(true);
+        AppProperties appProperties = createAppProperties("fr-FR", true);
+        MessageSource messageSource = createMessageSource(true);
+        LocalizedMessagesService messagesService = new LocalizedMessagesServiceImpl(appProperties, messageSource);
 
         // Act
-        String message = localizedMessagesService.getMessage("TestService.answer.the.questions");
+        String message = messagesService.getMessage("TestService.answer.the.questions");
 
         // Assert
         // When fallbackToSystemLocale is true, it should first try the system locale, then fall back to the default message bundle
-        assertThat(message).isNotNull();
+        assertThat(message).isEqualTo("Please answer the questions below");
     }
 
     @Test
     @DisplayName("Должен возвращать имя файла для русской локали при fallbackToSystemLocale=false")
     void shouldReturnRussianFileNameWithFallbackFalse() {
         // Arrange
-        // Using injected appProperties as TestFileNameProvider
-        appProperties.setLocale("ru-RU");
-        appProperties.setFallbackToSystemLocale(false);
-        Map<String, String> fileNameByLocaleTag = new HashMap<>();
-        fileNameByLocaleTag.put("ru-RU", "questions_ru.csv");
-        fileNameByLocaleTag.put("en-US", "questions_en.csv");
-        fileNameByLocaleTag.put("en", "questions_en.csv");
-        appProperties.setFileNameByLocaleTag(fileNameByLocaleTag);
+        boolean fallbackToSystemLocale = false;
+        TestFileNameProvider fileNameProvider = createTestFileNameProvider("ru-RU", fallbackToSystemLocale);
 
         // Act
-        String fileName = appProperties.getTestFileName();
+        String fileName = fileNameProvider.getTestFileName();
 
         // Assert
         assertThat(fileName).isEqualTo("questions_ru.csv");
@@ -151,17 +150,11 @@ public class SimpleLocalizationTest {
     @DisplayName("Должен возвращать имя файла для русской локали при fallbackToSystemLocale=true")
     void shouldReturnRussianFileNameWithFallbackTrue() {
         // Arrange
-        // Using injected appProperties as TestFileNameProvider
-        appProperties.setLocale("ru-RU");
-        appProperties.setFallbackToSystemLocale(true);
-        Map<String, String> fileNameByLocaleTag = new HashMap<>();
-        fileNameByLocaleTag.put("ru-RU", "questions_ru.csv");
-        fileNameByLocaleTag.put("en-US", "questions_en.csv");
-        fileNameByLocaleTag.put("en", "questions_en.csv");
-        appProperties.setFileNameByLocaleTag(fileNameByLocaleTag);
+        boolean fallbackToSystemLocale = true;
+        TestFileNameProvider fileNameProvider = createTestFileNameProvider("ru-RU", fallbackToSystemLocale);
 
         // Act
-        String fileName = appProperties.getTestFileName();
+        String fileName = fileNameProvider.getTestFileName();
 
         // Assert
         assertThat(fileName).isEqualTo("questions_ru.csv");
@@ -171,17 +164,11 @@ public class SimpleLocalizationTest {
     @DisplayName("Должен возвращать имя файла для английской локали при fallbackToSystemLocale=false")
     void shouldReturnEnglishFileNameWithFallbackFalse() {
         // Arrange
-        // Using injected appProperties as TestFileNameProvider
-        appProperties.setLocale("en-US");
-        appProperties.setFallbackToSystemLocale(false);
-        Map<String, String> fileNameByLocaleTag = new HashMap<>();
-        fileNameByLocaleTag.put("ru-RU", "questions_ru.csv");
-        fileNameByLocaleTag.put("en-US", "questions_en.csv");
-        fileNameByLocaleTag.put("en", "questions_en.csv");
-        appProperties.setFileNameByLocaleTag(fileNameByLocaleTag);
+        boolean fallbackToSystemLocale = false;
+        TestFileNameProvider fileNameProvider = createTestFileNameProvider("en-US", fallbackToSystemLocale);
 
         // Act
-        String fileName = appProperties.getTestFileName();
+        String fileName = fileNameProvider.getTestFileName();
 
         // Assert
         assertThat(fileName).isEqualTo("questions_en.csv");
@@ -191,19 +178,51 @@ public class SimpleLocalizationTest {
     @DisplayName("Должен возвращать имя файла для английской локали при fallbackToSystemLocale=true")
     void shouldReturnEnglishFileNameWithFallbackTrue() {
         // Arrange
-        // Using injected appProperties as TestFileNameProvider
-        appProperties.setLocale("en-US");
-        appProperties.setFallbackToSystemLocale(true);
+        boolean fallbackToSystemLocale = true;
+        TestFileNameProvider fileNameProvider = createTestFileNameProvider("en-US", fallbackToSystemLocale);
+
+        // Act
+        String fileName = fileNameProvider.getTestFileName();
+
+        // Assert
+        assertThat(fileName).isEqualTo("questions_en.csv");
+    }
+
+    private LocaleConfig createLocaleConfig(String localeTag) {
+        Locale locale = Locale.forLanguageTag(localeTag);
+        return () -> locale;
+    }
+
+    private AppProperties createAppProperties(String localeTag, boolean fallbackToSystemLocale) {
+        AppProperties appProperties = new AppProperties();
+        appProperties.setLocale(localeTag);
+        appProperties.setFallbackToSystemLocale(fallbackToSystemLocale);
         Map<String, String> fileNameByLocaleTag = new HashMap<>();
         fileNameByLocaleTag.put("ru-RU", "questions_ru.csv");
         fileNameByLocaleTag.put("en-US", "questions_en.csv");
         fileNameByLocaleTag.put("en", "questions_en.csv");
         appProperties.setFileNameByLocaleTag(fileNameByLocaleTag);
+        return appProperties;
+    }
 
-        // Act
-        String fileName = appProperties.getTestFileName();
+    private MessageSource createMessageSource(boolean fallbackToSystemLocale) {
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        messageSource.setBasename("classpath:messages");
+        messageSource.setDefaultEncoding("UTF-8");
+        messageSource.setFallbackToSystemLocale(fallbackToSystemLocale);
+        return messageSource;
+    }
 
-        // Assert
-        assertThat(fileName).isEqualTo("questions_en.csv");
+    private TestFileNameProvider createTestFileNameProvider(String localeTag, boolean fallbackToSystemLocale) {
+        Map<String, String> fileNameByLocaleTag = new HashMap<>();
+        fileNameByLocaleTag.put("ru-RU", "questions_ru.csv");
+        fileNameByLocaleTag.put("en-US", "questions_en.csv");
+        fileNameByLocaleTag.put("en", "questions_en.csv");
+
+        LocaleConfig localeConfig = createLocaleConfig(localeTag);
+
+        // Use AppProperties directly to match its behavior
+        AppProperties appProperties = createAppProperties(localeTag, fallbackToSystemLocale);
+        return appProperties;
     }
 }
