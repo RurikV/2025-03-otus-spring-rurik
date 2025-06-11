@@ -4,11 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.MessageSource;
-import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import ru.otus.hw.service.LocalizedMessagesService;
 import ru.otus.hw.service.LocalizedMessagesServiceImpl;
 
 import java.util.HashMap;
@@ -26,9 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 )
 @DisplayName("Тесты локализации")
 public class SimpleLocalizationTest {
-
-    @Autowired
-    private MessageSource messageSource;
 
     @Autowired
     private AppProperties appProperties;
@@ -212,43 +205,5 @@ public class SimpleLocalizationTest {
 
         // Assert
         assertThat(fileName).isEqualTo("questions_en.csv");
-    }
-
-    private LocaleConfig createLocaleConfig(String localeTag) {
-        Locale locale = Locale.forLanguageTag(localeTag);
-        return () -> locale;
-    }
-
-    private AppProperties createAppProperties(String localeTag, boolean fallbackToSystemLocale) {
-        AppProperties appProperties = new AppProperties();
-        appProperties.setLocale(localeTag);
-        appProperties.setFallbackToSystemLocale(fallbackToSystemLocale);
-        Map<String, String> fileNameByLocaleTag = new HashMap<>();
-        fileNameByLocaleTag.put("ru-RU", "questions_ru.csv");
-        fileNameByLocaleTag.put("en-US", "questions_en.csv");
-        fileNameByLocaleTag.put("en", "questions_en.csv");
-        appProperties.setFileNameByLocaleTag(fileNameByLocaleTag);
-        return appProperties;
-    }
-
-    private MessageSource createMessageSource(boolean fallbackToSystemLocale) {
-        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:messages");
-        messageSource.setDefaultEncoding("UTF-8");
-        messageSource.setFallbackToSystemLocale(fallbackToSystemLocale);
-        return messageSource;
-    }
-
-    private TestFileNameProvider createTestFileNameProvider(String localeTag, boolean fallbackToSystemLocale) {
-        Map<String, String> fileNameByLocaleTag = new HashMap<>();
-        fileNameByLocaleTag.put("ru-RU", "questions_ru.csv");
-        fileNameByLocaleTag.put("en-US", "questions_en.csv");
-        fileNameByLocaleTag.put("en", "questions_en.csv");
-
-        LocaleConfig localeConfig = createLocaleConfig(localeTag);
-
-        // Use AppProperties directly to match its behavior
-        AppProperties appProperties = createAppProperties(localeTag, fallbackToSystemLocale);
-        return appProperties;
     }
 }

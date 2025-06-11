@@ -4,9 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import ru.otus.hw.config.AppProperties;
@@ -24,8 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
     webEnvironment = SpringBootTest.WebEnvironment.NONE
 )
 class CommonHwTest {
-
-    private static final String CONFIGURATION_ANNOTATION_NAME = "org.springframework.context.annotation.Configuration";
 
     @DisplayName("AppProperties SHOULD NOT be annotated by @Configuration")
     @Test
@@ -71,13 +67,5 @@ class CommonHwTest {
                     "в т.ч. @Value). Следующие классы нарушают это правило: %n%s", 
                     String.join("%n", classesWithFieldInjections))
             .isEmpty();
-    }
-
-    private Class<?> getBeanClassByName(String beanClassName) {
-        try {
-            return Class.forName(beanClassName);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
