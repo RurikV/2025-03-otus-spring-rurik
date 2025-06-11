@@ -1,10 +1,18 @@
 package ru.otus.hw.config;
 
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import ru.otus.hw.service.IOService;
 
+@SpringBootTest(
+        properties = {
+                "spring.shell.interactive.enabled=false",
+                "spring.shell.script.enabled=false"
+        },
+        webEnvironment = SpringBootTest.WebEnvironment.NONE
+)
 @TestConfiguration
 public class TestIOConfig {
 
