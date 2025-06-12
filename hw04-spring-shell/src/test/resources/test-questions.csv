@@ -1,0 +1,3 @@
+# This is a test CSV file for CsvQuestionDao tests
+What is the capital of France?;Paris%true|London%false|Berlin%false
+What is 2+2?;3%false|4%true|5%false
